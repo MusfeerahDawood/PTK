@@ -1,0 +1,25 @@
+﻿@model IEnumerable<PTK.Models.Pizza>
+
+@{
+    ViewData["Title"] = "PizzaList";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Pizza Shop</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+  
+<div class="row">
+    @foreach(var Pizza in Model)
+    {
+        <div id="PizzaContainer" class="col-lg-3 col-md-6 col-sm-12">
+            <img id="PizzaImage style="width:100%;" height:100%;" src="@Pizza.URL" alt="@Pizza.Title"/>
+            <span id="pizzaTitle">@Pizza.Title </span>
+            <span id="pizzaPrice"> Rs. Comming Soon </span>
+            <span><input type="number" name="quantity" value="" placeholder="0"/></span>
+            <span><button>Add to Cart</button></span>
+        </div>
+    }
+
+</div>
+
