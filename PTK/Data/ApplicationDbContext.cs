@@ -14,5 +14,7 @@ namespace PTK.Data
         {
         }
         public DbSet<PTK.Models.Pizza> Pizza { get; set; }
+
+        public DbSet<PTK.Models.Chef> Chef { get; set; }
     }
 }

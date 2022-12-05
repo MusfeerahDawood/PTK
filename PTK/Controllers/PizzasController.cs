@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +69,7 @@ namespace PTK.Controllers
         }
 
         // GET: Pizzas/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -78,7 +80,8 @@ namespace PTK.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,URL")] Pizza pizza)
+        [Authorize]
+        public async Task<IActionResult> Create([Bind("Id,Title,URL,Price")] Pizza pizza)
         {
             if (ModelState.IsValid)
             {
@@ -110,7 +113,7 @@ namespace PTK.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL")] Pizza pizza)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL,Price")] Pizza pizza)
         {
             if (id != pizza.Id)
             {
@@ -141,6 +144,7 @@ namespace PTK.Controllers
         }
 
         // GET: Pizzas/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

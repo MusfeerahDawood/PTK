@@ -12,8 +12,8 @@
 <div class="row">
     @foreach(var Pizza in Model)
     {
-        <div id="PizzaContainer" class="col-lg-3 col-md-6 col-sm-12">
-            <img id="PizzaImage style="width:100%;" height:100%;" src="@Pizza.URL" alt="@Pizza.Title"/>
+        <div id="PizzaContainer" class="col-lg-3 col-md-4 col-sm-12" style="padding-bottom:50px">
+            <img id="PizzaImage style="width:80%;" height:80%;" src="@Pizza.URL" alt="@Pizza.URL"/>
             <span id="pizzaTitle">@Pizza.Title </span>
             <span id="pizzaPrice"> Rs. Comming Soon </span>
             <span><input type="number" name="quantity" value="" placeholder="0"/></span>
