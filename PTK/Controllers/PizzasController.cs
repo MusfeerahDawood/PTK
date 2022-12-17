@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -23,32 +22,21 @@ namespace PTK.Controllers
         // GET: Pizzas
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Pizza.ToListAsync());
+            ViewData["ChefofPizza"] = await _context.ChefofPizza.ToListAsync();
+            ViewData["Chefs"] = await _context.Chef.ToListAsync();
+            var applicationDbContext = _context.Pizza.Include(p => p.Menus);
+            return View(await applicationDbContext.ToListAsync());
         }
-
-
-        public async Task<IActionResult> SearchForm()
+        public IActionResult SearchForm()
         {
             return View();
         }
 
         public async Task<IActionResult> SearchResult(string Title)
         {
-            return View("Index", await _context.Pizza.Where(a=>a.Title.Contains(Title)).ToListAsync());
+            return View("Index", await _context.Pizza.Where(a => a.Title.Contains(Title)).ToListAsync());
+
         }
-        public async Task<IActionResult> PizzaList()
-        {
-            return View(await _context.Pizza.ToListAsync());
-        }
-
-
-
-
-        private object ToListAsync()
-        {
-            throw new NotImplementedException();
-        }
-
 
         // GET: Pizzas/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -59,6 +47,7 @@ namespace PTK.Controllers
             }
 
             var pizza = await _context.Pizza
+                .Include(p => p.Menus)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pizza == null)
             {
@@ -69,9 +58,10 @@ namespace PTK.Controllers
         }
 
         // GET: Pizzas/Create
-        [Authorize]
         public IActionResult Create()
         {
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name" ,"Logo");
+            ViewData["ChefId"] = new SelectList(_context.Chef, "Id", "Name");
             return View();
         }
 
@@ -80,15 +70,22 @@ namespace PTK.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> Create([Bind("Id,Title,URL,Price")] Pizza pizza)
+        public async Task<IActionResult> Create([Bind("Id,Title,URL,Price,MenuId")] Pizza pizza, List<int> Chefs)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(pizza);
                 await _context.SaveChangesAsync();
+                List<ChefofPizza> chefofPizza = new List<ChefofPizza>();
+                foreach (int chef in Chefs)
+                {
+                  chefofPizza.Add(new ChefofPizza { ChefId = chef, PizzaId = pizza.Id });
+                }
+                _context.ChefofPizza.AddRange(chefofPizza);
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name", pizza.MenuId);
             return View(pizza);
         }
 
@@ -105,6 +102,14 @@ namespace PTK.Controllers
             {
                 return NotFound();
             }
+            IList<ChefofPizza> chefofPizzas = await _context.ChefofPizza.Where<ChefofPizza>(a => a.ChefId == pizza.Id).ToListAsync();
+            IList<int> listChefs = new List<int>();
+            foreach (ChefofPizza chefofPizza in chefofPizzas)
+            {
+                listChefs.Add(chefofPizza.ChefId);
+            }
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Id", pizza.MenuId);
+            ViewData["ChefId"] = new MultiSelectList(_context.Chef, "Id", "Name", listChefs.ToArray());
             return View(pizza);
         }
 
@@ -113,7 +118,7 @@ namespace PTK.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL,Price")] Pizza pizza)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL,Price,MenuId")] Pizza pizza)
         {
             if (id != pizza.Id)
             {
@@ -140,11 +145,11 @@ namespace PTK.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name", pizza.MenuId);
             return View(pizza);
         }
 
         // GET: Pizzas/Delete/5
-        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -153,6 +158,7 @@ namespace PTK.Controllers
             }
 
             var pizza = await _context.Pizza
+                .Include(p => p.Menus)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pizza == null)
             {

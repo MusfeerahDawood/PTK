@@ -1,7 +1,5 @@
 ﻿@model IEnumerable<PTK.Models.Pizza>
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,12 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <a asp-action="Create">Create New</a> 
-
-    }
-
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -25,9 +18,14 @@
             <th>
                 @Html.DisplayNameFor(model => model.URL)
             </th>
-
             <th>
                 @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Menus)
+            </th>
+            <th>
+                Chefs
             </th>
             <th></th>
         </tr>
@@ -39,19 +37,35 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.URL)
+                 <img style="width:200px;" src="@item.URL" alt="@item.Title" />
             </td>
-             <td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                    @if (SignInManager.IsSignedIn(User))
+                @Html.DisplayFor(modelItem => item.Menus.Id)
+            </td>
+            <td>
+                    @foreach (var chef in ViewData["Chefs"] as List<Chef>)
                     {
-                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        foreach (var chefofPizza in ViewData["ChefofPizza"] as List<ChefofPizza>)
+                        {
+                            if (chef.Id == chefofPizza.ChefId && item.Id == chefofPizza.PizzaId)
+                            {
+                                <div id="ChefBox">
+                                    <span id="ChefName">@chef.Name</span>
+                                    <img id="ChefImage" src="@chef.Image" alt="@chef.Name" />
+                                </div>
+
+                            }
+                        }
                     }
-               
+
+                </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

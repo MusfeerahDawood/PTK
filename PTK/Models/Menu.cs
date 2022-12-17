@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace PTK.Models
 {
-    public class Chef
+    public class Menu
     {
         [Key]
         public int Id { get; set; }
-        [Required]
         public string Name { get; set; }
-        public string Image { get; set; }
-        public string Nationaliy { get; set; }
-      
+        
+        public string Logo { get; set; }
+        
 
         //Pizzas
         public List<Pizza> Pizzas { get; set; }

@@ -19,6 +19,21 @@ namespace PTK.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("ChefPizza", b =>
+                {
+                    b.Property<int>("ChefsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PizzasId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ChefsId", "PizzasId");
+
+                    b.HasIndex("PizzasId");
+
+                    b.ToTable("ChefPizza");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -226,13 +241,59 @@ namespace PTK.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nationaliy")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Chef");
+                });
+
+            modelBuilder.Entity("PTK.Models.ChefofPizza", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ChefId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PizzaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChefId");
+
+                    b.HasIndex("PizzaId");
+
+                    b.ToTable("ChefofPizza");
+                });
+
+            modelBuilder.Entity("PTK.Models.Menu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Logo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Menu");
                 });
 
             modelBuilder.Entity("PTK.Models.Pizza", b =>
@@ -242,7 +303,7 @@ namespace PTK.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ChefID")
+                    b.Property<int>("MenuId")
                         .HasColumnType("int");
 
                     b.Property<int>("Price")
@@ -258,9 +319,24 @@ namespace PTK.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChefID");
+                    b.HasIndex("MenuId");
 
                     b.ToTable("Pizza");
+                });
+
+            modelBuilder.Entity("ChefPizza", b =>
+                {
+                    b.HasOne("PTK.Models.Chef", null)
+                        .WithMany()
+                        .HasForeignKey("ChefsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PTK.Models.Pizza", null)
+                        .WithMany()
+                        .HasForeignKey("PizzasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -314,15 +390,39 @@ namespace PTK.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PTK.Models.Pizza", b =>
+            modelBuilder.Entity("PTK.Models.ChefofPizza", b =>
                 {
-                    b.HasOne("PTK.Models.Chef", "PizzaChef")
+                    b.HasOne("PTK.Models.Chef", "Chef")
                         .WithMany()
-                        .HasForeignKey("ChefID")
+                        .HasForeignKey("ChefId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PizzaChef");
+                    b.HasOne("PTK.Models.Pizza", "Pizzas")
+                        .WithMany()
+                        .HasForeignKey("PizzaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chef");
+
+                    b.Navigation("Pizzas");
+                });
+
+            modelBuilder.Entity("PTK.Models.Pizza", b =>
+                {
+                    b.HasOne("PTK.Models.Menu", "Menus")
+                        .WithMany("Pizzas")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menus");
+                });
+
+            modelBuilder.Entity("PTK.Models.Menu", b =>
+                {
+                    b.Navigation("Pizzas");
                 });
 #pragma warning restore 612, 618
         }
