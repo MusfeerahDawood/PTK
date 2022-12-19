@@ -27,15 +27,16 @@ namespace PTK.Controllers
             var applicationDbContext = _context.Pizza.Include(p => p.Menus);
             return View(await applicationDbContext.ToListAsync());
         }
-        public IActionResult SearchForm()
+        public async Task<IActionResult> PizzaDetails(int? Id)
         {
-            return View();
-        }
-
-        public async Task<IActionResult> SearchResult(string Title)
-        {
-            return View("Index", await _context.Pizza.Where(a => a.Title.Contains(Title)).ToListAsync());
-
+            if (Id == null)
+            {
+                return NotFound();
+            }
+            ViewData["ChefofPizza"] = await _context.ChefofPizza.ToListAsync();
+            ViewData["Chefs"] = await _context.Chef.ToListAsync();
+            var applicationDbContext = _context.Pizza.Include(b => b.Menus).Where(b => b.Id == Id);
+            return View("Index", await applicationDbContext.ToListAsync());
         }
 
         // GET: Pizzas/Details/5
@@ -118,8 +119,9 @@ namespace PTK.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL,Price,MenuId")] Pizza pizza)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,URL,Price,MenuId")] Pizza pizza,List<int> Chefs)
         {
+            var transaction = _context.Database.BeginTransaction();
             if (id != pizza.Id)
             {
                 return NotFound();
@@ -130,8 +132,23 @@ namespace PTK.Controllers
                 try
                 {
                     _context.Update(pizza);
-                    await _context.SaveChangesAsync();
-                }
+                    _context.SaveChanges();
+                    List<ChefofPizza> chefofPizza = new List<ChefofPizza>();
+                    foreach (int chef in Chefs)
+                    
+                        {
+                            chefofPizza.Add(new ChefofPizza { ChefId = chef, PizzaId = pizza.Id });
+                        }
+                        List<ChefofPizza> deleteChefofPizzas = await _context.ChefofPizza.Where<ChefofPizza>(a => a.PizzaId == pizza.Id).ToListAsync();
+                        _context.ChefofPizza.RemoveRange(deleteChefofPizzas);
+                        _context.SaveChanges();
+
+                        _context.ChefofPizza.UpdateRange(chefofPizza);
+                        _context.SaveChanges();
+
+                        await transaction.CommitAsync();
+                    }
+                
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!PizzaExists(pizza.Id))
@@ -176,6 +193,11 @@ namespace PTK.Controllers
             var pizza = await _context.Pizza.FindAsync(id);
             _context.Pizza.Remove(pizza);
             await _context.SaveChangesAsync();
+
+            List<ChefofPizza> deleteChefofPizzas = await _context.ChefofPizza.Where<ChefofPizza>(a => a.PizzaId == pizza.Id).ToListAsync();
+            _context.ChefofPizza.RemoveRange(deleteChefofPizzas);
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
 

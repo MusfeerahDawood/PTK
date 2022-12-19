@@ -5,7 +5,7 @@
 }
 
 .nav-item:hover {
-    background-color: lightgreen;
+    background-color: papayawhip;
     border-radius: 1em;
     font-weight: bold;
 }
@@ -97,4 +97,67 @@ body {
     display: inline-block;
     text-align: center;
     font-weight: bold;
+}
+
+#pizzaContainer {
+    margin-bottom: 10%;
+}
+
+#pizzaImage {
+    display: block;
+    margin: 0 auto;
+    width: 90%;
+    height: 90%;
+}
+
+#pizzaTitle {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#pizzaPrice {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 16px;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    color: dimgrey;
+    font-style: italic;
+}
+
+#quantityInput {
+    border: none;
+    width: 100%;
+    text-align: center;
+}
+
+    #quantityInput:focus {
+        border: none;
+        width: 100%;
+        text-align: center;
+        background-color: lightgreen;
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+#pizzaQuantity {
+    width: 45%;
+    margin-left: 5%;
+    border-top: 2px dotted grey;
+    border-bottom: 2px dotted grey;
+    display: inline-block;
+}
+
+#pizzaCartButton {
+    width: 45%;
+    display: inline-block;
+    border: none;
+    border-top: 2px dotted grey;
+    border-bottom: 2px dotted grey;
 }
